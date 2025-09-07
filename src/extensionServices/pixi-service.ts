@@ -435,13 +435,24 @@ export class PixiService implements IPixiService {
 			return "";
 		}
 
-		const projectFile = await vscode.workspace.findFiles(
-			new vscode.RelativePattern(dir, "{pixi,pyproject}.toml")
+		// First, try to find pixi.toml
+		let projectFiles = await vscode.workspace.findFiles(
+			new vscode.RelativePattern(dir, "pixi.toml")
 		);
 
-		if (projectFile) {
-			console.log("findProjectFile: Project file found");
-			return projectFile[0].fsPath;
+		if (projectFiles && projectFiles.length > 0) {
+			console.log("findProjectFile: pixi.toml found");
+			return projectFiles[0].fsPath;
+		}
+
+		// If pixi.toml not found, try to find pyproject.toml
+		projectFiles = await vscode.workspace.findFiles(
+			new vscode.RelativePattern(dir, "pyproject.toml")
+		);
+
+		if (projectFiles && projectFiles.length > 0) {
+			console.log("findProjectFile: pyproject.toml found");
+			return projectFiles[0].fsPath;
 		}
 
 		console.log("findProjectFile: No project file found");
